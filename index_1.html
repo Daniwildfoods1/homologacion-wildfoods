@@ -1,0 +1,741 @@
+<title>Homologación de Insumos</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    color-scheme: dark;
+    /* ---- Wild Foods "SABORES" brand tokens ---- */
+    --bg:#211D18;
+    --bg-2:#2A241D;
+    --surface:#FBF5E7;
+    --surface-2:#EFE4C9;
+    --surface-3:#E4D6AF;
+    --ink:#241C12;
+    --ink-soft:#5B4B33;
+    --ink-mute:#8A7A5A;
+    --on-dark:#F3ECDA;
+    --on-dark-soft:#C9BFA9;
+    --on-dark-mute:#948870;
+    --border:#D8C79A;
+    --border-dark:#453B2C;
+    --accent:#1E6F5C;
+    --accent-ink:#12483C;
+    --accent-soft:#DCEDE6;
+    --accent-soft-ink:#175647;
+    --good:#1E7A4C;
+    --good-soft:#DEEEE0;
+    --warn:#B8860B;
+    --warn-soft:#F3E7C6;
+    --crit:#B23A22;
+    --crit-soft:#F5DFD6;
+    --mute-status:#726952;
+    --mute-status-soft:#E7DEC4;
+    --shadow: 0 2px 4px rgba(20,15,5,0.35), 0 14px 30px -14px rgba(0,0,0,0.55);
+    --shadow-tape: 0 3px 7px rgba(20,12,0,0.4);
+    --g0:#D9E9DA; --g1:#ABD2BB; --g2:#7DB89C; --g3:#4E9C82; --g4:#2C7E68; --g5:#135E4F;
+    --tape:#EFC13A;
+    --tape-2:#E3AE22;
+    --tape-shadow:#9C7714;
+    --tape-ink:#241704;
+    --texture: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMjAiIGhlaWdodD0iMjIwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC44NSIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjxmZUNvbG9yTWF0cml4IHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDEgIDAgMCAwIDAgMC45NyAgMCAwIDAgMCAwLjkgIDAgMCAwIDAuMDUgMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNuKSIvPjwvc3ZnPg==");
+  }
+
+  *{box-sizing:border-box;}
+  html,body{background:var(--bg);}
+  body{
+    margin:0; color:var(--on-dark);
+    font-family:"Inter", ui-sans-serif, system-ui, sans-serif;
+    padding-inline:20px; padding-block:28px 64px;
+    position:relative;
+    background:
+      radial-gradient(ellipse 900px 500px at 12% -10%, rgba(255,255,255,0.05), transparent 60%),
+      radial-gradient(ellipse 800px 600px at 90% 10%, rgba(0,0,0,0.28), transparent 55%),
+      radial-gradient(ellipse 700px 500px at 80% 95%, rgba(0,0,0,0.22), transparent 55%),
+      linear-gradient(155deg, #26221B 0%, #1D1A15 55%, #221D17 100%);
+  }
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image: var(--texture); background-size:220px 220px;
+    mix-blend-mode:overlay; opacity:.55;
+  }
+  .wrap{max-width:1180px; margin:0 auto; display:flex; flex-direction:column; gap:30px; position:relative; z-index:1;}
+  h1,h2,h3{text-wrap:balance; font-weight:700; margin:0;}
+  .display{font-family:"Archivo Black", "Inter", ui-sans-serif, sans-serif; font-weight:400;}
+  .mono{font-family:"IBM Plex Mono", ui-monospace, monospace;}
+  .tabular{font-variant-numeric:tabular-nums;}
+
+  /* ---------- washi tape ---------- */
+  .tape{
+    display:inline-flex; align-items:center; gap:8px; width:fit-content;
+    background:var(--tape); color:var(--tape-ink);
+    font-family:"Archivo Black", sans-serif; font-weight:400;
+    font-size:13px; letter-spacing:.06em; text-transform:uppercase;
+    padding:8px 18px; box-shadow:var(--shadow-tape);
+    clip-path: polygon(0% 8%, 3% 0%, 97% 2%, 100% 10%, 99% 90%, 96% 100%, 4% 98%, 1% 92%);
+    transform:rotate(-1.6deg);
+  }
+  .tape.small{font-size:11px; padding:5px 12px; letter-spacing:.05em;}
+  .tape.tilt-r{transform:rotate(1.4deg);}
+
+  /* ---------- header ---------- */
+  header{display:flex; flex-direction:column; gap:12px; padding-bottom:4px;}
+  .header-card{
+    background:var(--surface); border:1px solid var(--border-dark); border-radius:4px;
+    padding:22px 24px 20px; box-shadow:var(--shadow); position:relative;
+    color:var(--ink);
+  }
+  .eyebrow-row{position:absolute; top:-16px; left:22px;}
+  h1{font-size:26px; letter-spacing:-0.01em; color:var(--ink); margin-top:8px;}
+  .subline{color:var(--ink-soft); font-size:14.5px; max-width:70ch; line-height:1.5;}
+  .meta-row{display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:10px; font-size:12.5px; color:var(--ink-mute);}
+  .meta-row b{color:var(--ink-soft); font-weight:600;}
+  .meta-row .live{color:var(--accent-ink); font-weight:600;}
+
+  /* ---------- KPI strip ---------- */
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px;}
+  .kpi{
+    background:var(--surface); border:1px solid var(--border-dark); border-radius:3px;
+    padding:16px 16px 14px; display:flex; flex-direction:column; gap:6px; box-shadow:var(--shadow);
+    color:var(--ink); position:relative;
+  }
+  .kpi::before{
+    content:""; position:absolute; top:-8px; left:14px; width:34px; height:14px;
+    background:var(--tape-2); opacity:.92; box-shadow:var(--shadow-tape);
+    clip-path: polygon(0% 15%, 100% 0%, 100% 85%, 0% 100%);
+  }
+  .kpi .label{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-mute); font-weight:600;}
+  .kpi .value{font-size:27px; font-weight:800; line-height:1; font-family:"Archivo Black",sans-serif; font-weight:400;}
+  .kpi .sub{font-size:12.5px; color:var(--ink-soft);}
+  .kpi .value.crit{color:var(--crit);}
+  .kpi .value.good{color:var(--good);}
+
+  /* ---------- panels ---------- */
+  .panel{
+    background:var(--surface); border:1px solid var(--border-dark); border-radius:4px;
+    padding:20px 22px; box-shadow:var(--shadow); color:var(--ink); position:relative;
+  }
+  .panel-head{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; flex-wrap:wrap;}
+  .panel-head h2{font-size:14px;}
+  .panel-head .count{font-size:12.5px; color:var(--ink-mute);}
+  .panel .subline{margin-top:-10px; margin-bottom:6px;}
+
+  .stage-rows{display:flex; flex-direction:column; gap:10px;}
+  .stage-row{display:grid; grid-template-columns:172px 1fr 28px; align-items:center; gap:12px;}
+  .stage-name{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-soft); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .stage-swatch{width:11px; height:11px; border-radius:2px; flex:none; box-shadow:0 0 0 1px rgba(36,28,18,.25) inset;}
+  .stage-track{position:relative; height:16px; background:var(--surface-2); border-radius:2px; overflow:hidden; border:1px solid var(--border);}
+  .stage-fill{position:absolute; top:0; left:0; height:100%; border-radius:1px;}
+  .stage-count{font-size:13.5px; font-weight:700; text-align:right;}
+
+  /* ---------- quarterly ---------- */
+  .qtr-rows{display:flex; flex-direction:column; gap:10px;}
+  .qtr-row{display:grid; grid-template-columns:150px 1fr 32px; align-items:center; gap:12px;}
+  .qtr-name{display:flex; align-items:center; gap:6px; font-size:13px; color:var(--ink-soft); font-weight:500; white-space:nowrap;}
+  .qtr-tag{font-size:10.5px; font-weight:600; color:var(--ink-mute); background:var(--surface-2); border-radius:99px; padding:1px 7px;}
+  .qtr-track{position:relative; height:16px; background:var(--surface-2); border-radius:2px; overflow:hidden; border:1px solid var(--border);}
+  .qtr-fill{position:absolute; top:0; left:0; height:100%; border-radius:1px; background:var(--accent);}
+  .qtr-fill.current{background:var(--ink-mute); opacity:.55;}
+  .qtr-count{font-size:13.5px; font-weight:700; text-align:right;}
+
+  /* ---------- gates legend (compact, in footer) ---------- */
+  .gate-legend{margin-top:8px; padding-top:14px; border-top:1px solid var(--border-dark);}
+  .gate-legend-title{margin-bottom:8px;}
+  .gate-legend-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
+    gap:6px 20px;
+  }
+  .gl-item{font-size:11.5px; line-height:1.5; color:var(--on-dark-mute); display:flex; gap:7px; align-items:flex-start;}
+  .gl-dot{width:8px; height:8px; border-radius:50%; flex:none; margin-top:4px; box-shadow:0 0 0 1px rgba(0,0,0,.35) inset;}
+  .gl-item b{color:var(--on-dark-soft); font-weight:600;}
+  .gl-pending{font-style:italic; opacity:.85;}
+
+  /* ---------- filters ---------- */
+  .filters{display:flex; flex-wrap:wrap; gap:10px; align-items:center;}
+  .filters input[type="text"], .filters select{
+    font:inherit; font-size:13px; color:var(--ink); background:var(--surface);
+    border:1px solid var(--border); border-radius:3px; padding:7px 10px;
+  }
+  .filters input[type="text"]{min-width:220px;}
+  .filters .count-note{font-size:12.5px; color:var(--ink-mute); margin-left:auto;}
+  .filters button.reset{
+    font:inherit; font-size:12.5px; color:var(--accent-ink); background:none; border:1px solid var(--accent);
+    border-radius:3px; padding:6px 10px; cursor:pointer;
+  }
+  .filters button.reset:hover{background:var(--accent-soft);}
+
+  .msel{position:relative;}
+  .msel-btn{
+    font:inherit; font-size:13px; color:var(--ink); background:var(--surface);
+    border:1px solid var(--border); border-radius:3px; padding:7px 10px;
+    cursor:pointer; display:inline-flex; align-items:center; gap:7px;
+  }
+  .msel-btn:after{content:"▾"; font-size:10px; color:var(--ink-mute);}
+  .msel-btn.active{border-color:var(--accent); color:var(--accent-ink);}
+  .msel-count{
+    background:var(--accent); color:#fff; font-size:11px; font-weight:700;
+    border-radius:99px; padding:0 6px; line-height:1.6;
+  }
+  .msel-panel{
+    position:absolute; top:calc(100% + 6px); left:0; z-index:20; min-width:200px;
+    background:var(--surface); border:1px solid var(--border); border-radius:4px;
+    box-shadow:var(--shadow); padding:6px; display:flex; flex-direction:column; gap:1px;
+  }
+  .msel-panel[hidden]{display:none;}
+  .msel-opt{
+    display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:3px;
+    font-size:13px; cursor:pointer; user-select:none; color:var(--ink);
+  }
+  .msel-opt:hover{background:var(--surface-2);}
+  .msel-opt input{accent-color:var(--accent); width:14px; height:14px; cursor:pointer;}
+
+  /* ---------- board ---------- */
+  .callout{
+    display:flex; gap:10px; align-items:flex-start; background:var(--warn-soft);
+    border:1px solid var(--warn); border-left:5px solid var(--crit);
+    border-radius:3px; padding:10px 14px; margin:-4px 0 14px; font-size:12.5px;
+    color:var(--ink-soft); line-height:1.5;
+  }
+  .callout b{color:var(--ink);}
+  .board{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px;}
+  .card{
+    background:var(--surface); border:1px solid var(--border-dark); border-radius:3px;
+    padding:14px 16px; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow);
+    cursor:pointer; transition:border-color .15s, transform .15s; color:var(--ink);
+  }
+  .card:hover{border-color:var(--accent); transform:translateY(-2px);}
+  .card-hint{font-size:11px; font-weight:600; color:var(--ink-mute); text-align:right;}
+  .card-hint.crit{color:var(--crit);}
+  .card-top{display:flex; justify-content:space-between; gap:10px;}
+  .card-title{font-size:14.5px; font-weight:600; line-height:1.3;}
+  .card-code{font-size:11px; color:var(--ink-mute); white-space:nowrap;}
+  .chips{display:flex; flex-wrap:wrap; gap:6px;}
+  .chip{
+    font-size:11px; font-weight:600; padding:3px 8px; border-radius:99px; white-space:nowrap;
+    display:inline-flex; align-items:center; gap:4px;
+  }
+  .chip.resp{background:var(--surface-2); color:var(--ink-soft);}
+  .chip.kraljic{background:var(--accent-soft); color:var(--accent-soft-ink);}
+  .chip.prio-0{background:var(--crit-soft); color:var(--crit);}
+  .chip.prio-1{background:var(--warn-soft); color:var(--warn);}
+  .chip.prio-2, .chip.prio-3{background:var(--surface-2); color:var(--ink-soft);}
+  .chip.prio-4{background:var(--surface-2); color:var(--ink-mute);}
+
+  .stepper{display:flex; align-items:center; gap:3px;}
+  .step{flex:1; height:6px; border-radius:2px; background:var(--surface-2);}
+  .step.done{background:var(--accent);}
+  .step.current{background:var(--accent); position:relative;}
+  .gate-label{font-size:12px; color:var(--ink-soft); display:flex; justify-content:space-between; gap:8px;}
+  .gate-label b{color:var(--ink); font-weight:600;}
+
+  .card-bottom{display:flex; justify-content:space-between; align-items:flex-end; gap:10px; border-top:1px solid var(--border); padding-top:10px;}
+  .days{display:flex; flex-direction:column; gap:2px;}
+  .days .n{font-size:20px; font-weight:700;}
+  .days .n.good{color:var(--good);}
+  .days .n.warn{color:var(--warn);}
+  .days .n.crit{color:var(--crit);}
+  .days .cap{font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-mute); font-weight:600;}
+
+  .empty-note{padding:24px; text-align:center; color:var(--ink-mute); font-size:13.5px;}
+
+  /* ---------- table ---------- */
+  .table-scroll{overflow-x:auto;}
+  table{border-collapse:collapse; width:100%; font-size:13px; min-width:760px; color:var(--ink);}
+  thead th{
+    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--ink-mute); font-weight:600; padding:0 10px 8px; border-bottom:1px solid var(--border);
+  }
+  tbody td{padding:10px; border-bottom:1px solid var(--border); vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:var(--surface-2);}
+  td.name{font-weight:500; max-width:320px;}
+  td.name .code{display:block; font-size:11px; color:var(--ink-mute); margin-top:2px;}
+  .result-chip{font-size:11.5px; font-weight:600; padding:3px 9px; border-radius:99px; display:inline-flex; align-items:center; gap:5px; white-space:nowrap;}
+  .result-chip.ok{background:var(--good-soft); color:var(--good);}
+  .result-chip.no{background:var(--crit-soft); color:var(--crit);}
+  .result-chip.pause{background:var(--mute-status-soft); color:var(--mute-status);}
+
+  footer{
+    border-top:1px solid var(--border-dark); padding-top:18px; display:flex; flex-direction:column; gap:6px;
+    font-size:12.5px; color:var(--on-dark-mute); line-height:1.6;
+  }
+  footer b{color:var(--on-dark-soft);}
+
+  @media (max-width:520px){
+    .board{grid-template-columns:1fr;}
+    .funnel-labels span{font-size:9.5px;}
+    .header-card{padding:20px 16px 18px;}
+  }
+
+  /* ---------- detail modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(15,12,6,0.6); backdrop-filter:blur(1px);
+    display:flex; align-items:center; justify-content:center; padding:20px; z-index:100;
+  }
+  .modal-overlay[hidden]{display:none;}
+  .modal-card{
+    background:var(--surface); border:1px solid var(--border-dark); border-radius:6px;
+    box-shadow:var(--shadow); max-width:560px; width:100%; max-height:85vh; overflow-y:auto;
+    padding:24px 26px; position:relative; color:var(--ink);
+  }
+  .modal-close{
+    position:absolute; top:14px; right:14px; background:var(--surface-2); border:none;
+    border-radius:99px; width:28px; height:28px; cursor:pointer; color:var(--ink-soft); font-size:14px;
+  }
+  .modal-close:hover{background:var(--border);}
+  .modal-title{font-size:17px; font-weight:600; margin-bottom:2px; padding-right:30px; line-height:1.3;}
+  .modal-code{font-size:11.5px; color:var(--ink-mute); margin-bottom:12px;}
+  .modal-stat-row{
+    display:flex; gap:18px; flex-wrap:wrap; margin:14px 0; padding-bottom:14px;
+    border-bottom:1px solid var(--border);
+  }
+  .modal-stat{display:flex; flex-direction:column; gap:2px;}
+  .modal-stat .k{font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-mute); font-weight:600;}
+  .modal-stat .v{font-size:15px; font-weight:700;}
+  .modal-section{margin-bottom:14px;}
+  .modal-section h4{font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-mute); font-weight:600; margin:0 0 6px;}
+  .modal-section p{font-size:13.5px; color:var(--ink); line-height:1.55; margin:0; white-space:pre-wrap;}
+  .modal-empty{font-size:13px; color:var(--ink-mute); font-style:italic;}
+  .modal-section-highlight{
+    background:var(--accent-soft); border-radius:6px; padding:12px 14px; margin:0 0 14px;
+  }
+  .modal-section-highlight h4{color:var(--accent-soft-ink);}
+  .modal-comment-meta{font-size:12px; color:var(--accent-soft-ink); margin-bottom:5px; font-weight:600;}
+  .modal-link{
+    display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600;
+    color:var(--accent-ink); text-decoration:none; margin-top:2px;
+  }
+  .modal-link:hover{text-decoration:underline;}
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="header-card">
+      <div class="eyebrow-row"><span class="tape">Wildfoods R&amp;D</span></div>
+      <h1>Homologación de materias primas y envases</h1>
+      <p class="subline">Avance por insumo en las etapas del proceso de homologación, y resultado de las validaciones recientes. Datos tomados de la vista <b style="color:var(--ink-soft)">"Homologación"</b> del Notion de Proyectos Inter-áreas.</p>
+      <div class="meta-row">
+        <span>📅 Corte al <b id="today-label"></b></span>
+        <span>🗂️ <b id="active-count-label"></b> insumos en proceso</span>
+        <span class="live">🔄 Se actualiza automáticamente cada lunes con la información de Notion</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="kpis" id="kpi-strip"></section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <span class="tape small">Distribución por etapa</span>
+      <span class="count" id="funnel-count"></span>
+    </div>
+    <div class="stage-rows" id="funnel-bar"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <span class="tape small">Tablero activo</span>
+      <span class="count" id="board-count"></span>
+    </div>
+    <p class="subline" style="margin:-2px 0 4px;">Haz clic en un insumo para ver su descripción y comentarios de Notion.</p>
+    <div class="callout">
+      <span>⚠</span>
+      <div><b>Más de 5 meses abiertos:</b> los insumos marcados en rojo muestran siempre su motivo de atraso — haz clic en la tarjeta para verlo en el detalle, con la descripción y el último comentario registrados en Notion.</div>
+    </div>
+    <div class="filters">
+      <input type="text" id="f-search" placeholder="Buscar insumo o código…">
+      <select id="f-gate"><option value="">Todas las etapas</option></select>
+      <div class="msel" id="f-resp-wrap">
+        <button type="button" class="msel-btn" id="f-resp-btn">Responsables<span class="msel-count" id="f-resp-count" hidden></span></button>
+        <div class="msel-panel" id="f-resp-panel" hidden></div>
+      </div>
+      <select id="f-prio"><option value="">Toda prioridad</option></select>
+      <select id="f-sort">
+        <option value="old">Más antiguo → más nuevo</option>
+        <option value="new">Más nuevo → más antiguo</option>
+      </select>
+      <button class="reset" id="f-reset" type="button">Limpiar filtros</button>
+    </div>
+    <div class="board" id="board" style="margin-top:14px;"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <span class="tape small tilt-r">Validaciones por trimestre</span>
+      <span class="count" id="quarter-count"></span>
+    </div>
+    <p class="subline" style="margin:-2px 0 4px;">Insumos con Status "Done" o "Aprobado" en Notion (ambos cuentan como validados), agrupados por la fecha de cierre ("Fecha Final", o el último contacto si no hay fecha final) de cada uno.</p>
+    <div class="qtr-rows" id="quarter-bar"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <span class="tape small">Historial reciente</span>
+      <span class="count" id="hist-count"></span>
+    </div>
+    <p class="subline" style="margin:-2px 0 4px;">Últimos insumos que salieron del proceso — validados, rechazados o descartados. Sirve de referencia de cuánto toma en la práctica.</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Insumo</th><th>Resultado</th><th>Etapa en que quedó</th><th>Meses que tomó</th><th>Responsable</th><th>Prioridad</th>
+          </tr>
+        </thead>
+        <tbody id="hist-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <div><b>Cómo leer "Meses abiertos":</b> verde &lt; 2 meses, ámbar 2–5, rojo &gt; 5 meses desde la fecha de creación del insumo en Notion hasta hoy.</div>
+    <div><b>Cómo leer "Validado":</b> se considera validado cuando el Status del insumo en Notion es "Done" o "Aprobado". "Desechado" y "Rechazado" cuentan como no validado; "Pausado" queda aparte.</div>
+    <div><b>Sobre el % y los tiempos del historial:</b> Notion calcula un "% Avance" propio con fórmulas que esta conexión no puede leer todavía, así que aquí el avance se estima por la etapa (Gate) en la que está cada insumo. Los "meses que tomó" del historial usan la fecha del último contacto registrado como proxy del cierre, así que en insumos sin ese dato no se puede calcular y se marcan como "n/d".</div>
+    <div><b>Sobre "Validaciones por trimestre":</b> cuenta insumos con Status "Done" o "Aprobado" en toda la vista Homologación (no solo el historial reciente de arriba), agrupados según su fecha "Fecha Final" en Notion (o el último contacto si no hay Fecha Final). El trimestre en curso se muestra en gris porque todavía no termina.</div>
+    <div><b>Sobre la actualización:</b> este panel se sincroniza automáticamente con Notion todos los lunes. Si necesitas datos más al día en otro momento, pide una actualización.</div>
+
+    <div class="gate-legend">
+      <div class="gate-legend-title"><b>Símbología de etapas (Gates):</b></div>
+      <div class="gate-legend-grid">
+        <div class="gl-item"><span class="gl-dot" style="background:var(--g0)"></span><span><b>0 · Calificación inicial:</b> Desarrollo revisa la información documental junto con Supply, e iteran junto al proveedor hasta resolver todas las dudas.</span></div>
+        <div class="gl-item"><span class="gl-dot" style="background:var(--g1)"></span><span><b>1 · Prueba de laboratorio:</b> etapa exclusiva de Desarrollo — se prueba la MMPP sola o aplicada en algún producto, cuando es posible.</span></div>
+        <div class="gl-item"><span class="gl-dot" style="background:var(--g2)"></span><span><b>2 · Validación técnica:</b> Calidad valida al proveedor en certificaciones de calidad, del proveedor y del distribuidor.</span></div>
+        <div class="gl-item"><span class="gl-dot" style="background:var(--g3)"></span><span><b>3 · Prueba industrial:</b> desde que se piden las MMPP para la prueba hasta que Desarrollo envía el informe de homologación.</span></div>
+        <div class="gl-item"><span class="gl-dot" style="background:var(--g4)"></span><span><b>4 · Compra:</b> gestión de compra de la MMPP ya evaluada, previa a su incorporación a producción. <span class="gl-pending">(descripción a confirmar con el equipo)</span></span></div>
+        <div class="gl-item"><span class="gl-dot" style="background:var(--g5)"></span><span><b>5 · Excepción gerencial:</b> Supply tiene problemas de abastecimiento y la MMPP no pasa por ninguna de las etapas tradicionales anteriores.</span></div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<div class="modal-overlay" id="detail-modal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button class="modal-close" id="modal-close" type="button" aria-label="Cerrar">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const DATA = {"today": "2026-09-24", "active": [{"nombre": "Homologación WPC 80 Inst (Barras WP)- F: Sooro", "status": "In progress", "gate": "Gate 3: Prueba Industrial", "gate_pct": 67, "fecha_creacion": "2025-08-28", "ultimo_contacto": "2026-08-19", "dias_abiertos": 392, "responsable": ["Supply"], "prioridad": "0 - Mega Urgente", "cuadrante_kraljic": "Estratégico", "codigo_proyecto": "SPHM2025153", "url": "https://app.notion.com/25db4f7f99f8801988f3ee5332612d5f", "descripcion": "Pasa PI, Falta compra - ver monitoreo de selenio-  Licitación 2026 (esta mmpp ya se encuentra homologada, se debe avanzar con la validación del Fabricante como venta directa)", "comentarios": null, "ultimo_comentario": {"autor": "Daniela Alvarado", "fecha": "2026-09-23", "texto": "Hola y nos dieron fecha de llegada?"}}, {"nombre": "Homologación Maltitol - F: Huakang Pharma D: Huakang Pharma", "status": "In progress", "gate": "Gate 3: Prueba Industrial", "gate_pct": 67, "fecha_creacion": "2025-11-25", "ultimo_contacto": "2026-03-23", "dias_abiertos": 303, "responsable": ["Supply", "Desarrollo"], "prioridad": "2 - Necesario CP", "cuadrante_kraljic": "Apalancamiento", "codigo_proyecto": "SPHM2025222", "url": "https://app.notion.com/2b6b4f7f99f880898d9cc9603d115f4a", "descripcion": "Fecha PI - mover bidon a AL - 01/10 - Este tiene buen precio.", "comentarios": "0,5 USD/kg", "ultimo_comentario": {"autor": "Vania Menares", "fecha": "2026-09-15", "texto": "El producto está definido en Wfit coco en alea, solo falta las gestiones logisticas y coordinación con planta para la pi Eliney Villarroel Daniela Alvarado"}}, {"nombre": "Homologación - Pasta de almendra - F: Cabilterra D: Cabilterra", "status": "In progress", "gate": "Gate 3: Prueba Industrial", "gate_pct": 67, "fecha_creacion": "2025-12-23", "ultimo_contacto": "2026-04-08", "dias_abiertos": 275, "responsable": ["Desarrollo", "Supply"], "prioridad": "2 - Necesario CP", "cuadrante_kraljic": "Apalancamiento", "codigo_proyecto": "SPHM2025240", "url": "https://app.notion.com/2d2b4f7f99f880678cc0ea5f057f1065", "descripcion": "Pasa a PI - Esta OK - 21/09 - WP Caramelo ME", "comentarios": "8.600 $/kg", "ultimo_comentario": {"autor": "Vania Menares", "fecha": "2026-09-23", "texto": "Se hizo la pi, sin poder asistir a melelli, 22/09 se solicitaron las muestras (junto con el envio de calidad, para prox lunes ) y se evaluara en la proxima semana Marion Ludanyi Eliney Villarroel"}}, {"nombre": "Homologación - Frambuesa en polvo - JF-Natural", "status": "In progress", "gate": "Gate 3: Prueba Industrial", "gate_pct": 67, "fecha_creacion": "2025-12-29", "ultimo_contacto": "2026-09-24", "dias_abiertos": 269, "responsable": ["Proveedor", "Supply"], "prioridad": "3 - Necesario MP", "cuadrante_kraljic": "Cuello de Botella", "codigo_proyecto": "SPHM2025247", "url": "https://app.notion.com/2d8b4f7f99f8809a88c3c709cec650d5", "descripcion": "Pasa a PI - WF Berries 03/09 en AL - Falta sensorial de MRKT - Se pide compromiso de devolución, proveedor recomienda envio aereo. - Homologación - Frambuesa en polvo - JF-Natural. WS maqui chia - WF coco berries - WPP cheescake", "comentarios": null, "ultimo_comentario": {"autor": "Vania Menares", "fecha": "2026-09-15", "texto": "Se espera respuesta del proveedor frente a su packaging y condiciones de almacenamiento para ver si se aprueba o se rechaza y además evaluar mkt Eliney Villarroel Daniela Alvarado"}}, {"nombre": "Homologación - Maní grana - P: MacroFood F: JBL", "status": "In progress", "gate": "Gate 5: Excepción Gerencial", "gate_pct": 100, "fecha_creacion": "2026-03-12", "ultimo_contacto": "2026-04-29", "dias_abiertos": 196, "responsable": ["Supply", "Proveedor"], "prioridad": "0 - Mega Urgente", "cuadrante_kraljic": "Cuello de Botella", "codigo_proyecto": null, "url": "https://app.notion.com/321b4f7f99f8800b8ddefe376123fde1", "descripcion": "FALTA Desglose de fibras para cambiar status aprobado - ensayo para el 30/09 - SB mani WFF - Búsqueda de opciones proveedores maní.", "comentarios": "2,02 a 2,16 USD depende del formato y transporte.", "ultimo_comentario": {"autor": "Vania Menares", "fecha": "2026-09-24", "texto": "Se manda informe 23/09 Eliney Villarroel aprobado"}}, {"nombre": "Homologación Film - Winflex", "status": "In progress", "gate": "Gate 3: Prueba Industrial", "gate_pct": 67, "fecha_creacion": "2026-03-12", "ultimo_contacto": "2026-05-04", "dias_abiertos": 196, "responsable": ["Proveedor", "Calidad"], "prioridad": "4 - Necesario LP", "cuadrante_kraljic": "Cuello de Botella", "codigo_proyecto": null, "url": "https://app.notion.com/321b4f7f99f8801791c1fc594deff4f5", "descripcion": "Solicitada cotización OTR y WVTR - Pasar a PI oficial- Katy esta con dudas - Búsqueda de opciones proveedores Film.", "comentarios": null, "ultimo_comentario": {"autor": "Daniela Alvarado", "fecha": "2026-09-23", "texto": "excelente Gracias !"}}, {"nombre": "Homologación - WPC 80 inst (Barras WP)- Milk & Whey Ingredients", "status": "In progress", "gate": "Gate 3: Prueba Industrial", "gate_pct": 67, "fecha_creacion": "2026-03-12", "ultimo_contacto": "2026-05-05", "dias_abiertos": 196, "responsable": ["Desarrollo", "Supply"], "prioridad": "2 - Necesario CP", "cuadrante_kraljic": "Estratégico", "codigo_proyecto": null, "url": "https://app.notion.com/321b4f7f99f880a5a4e1e18d6c6cff39", "descripcion": "Esperar doc proveedores para cerrar informe", "comentarios": null, "ultimo_comentario": {"autor": "Vania Menares", "fecha": "2026-09-23", "texto": "Eliney Villarroel se manda informe de homologación , especificando las observaciones con este proveedor, y quedando pendiente documentos"}}, {"nombre": "Homologación Mani Split Tostado - F: Maniagro D: Maniagro", "status": "In progress", "gate": "Gate 3: Prueba Industrial", "gate_pct": 67, "fecha_creacion": "2026-05-14", "ultimo_contacto": "2026-05-21", "dias_abiertos": 133, "responsable": ["Supply", "Proveedor"], "prioridad": "2 - Necesario CP", "cuadrante_kraljic": "Cuello de Botella", "codigo_proyecto": null, "url": "https://app.notion.com/360b4f7f99f88029a90ecc02c0b3856b", "descripcion": "Pedir PI - 15 kg  - Búsqueda de precios para maní.", "comentarios": "USD 1.4/kg FCA", "ultimo_comentario": {"autor": "Daniela Alvarado", "fecha": "2026-09-23", "texto": "Actualmente entonces nos encontramos esperando que llegue la mmpp para agendar PI"}}, {"nombre": "Homologación Pasta de Mani - F: Maniagro D: Maniagro", "status": "In progress", "gate": "Gate 3: Prueba Industrial", "gate_pct": 67, "fecha_creacion": "2026-05-22", "ultimo_contacto": "2026-05-21", "dias_abiertos": 125, "responsable": ["Supply", "Proveedor"], "prioridad": "2 - Necesario CP", "cuadrante_kraljic": "Estratégico", "codigo_proyecto": null, "url": "https://app.notion.com/368b4f7f99f880998958fae3edf68742", "descripcion": "Pedir PI - 35 kg  - Búsqueda de precios para maní.", "comentarios": "USD 1.5/kg FCA", "ultimo_comentario": {"autor": "Daniela Alvarado", "fecha": "2026-09-23", "texto": "También a la espera de la llegada de la pasta de maní para PI"}}, {"nombre": "Homologación Mani Grana - F: Maniagro D: Maniagro", "status": "In progress", "gate": "Gate 3: Prueba Industrial", "gate_pct": 67, "fecha_creacion": "2026-05-22", "ultimo_contacto": "2026-05-21", "dias_abiertos": 125, "responsable": ["Supply", "Proveedor"], "prioridad": "2 - Necesario CP", "cuadrante_kraljic": "Cuello de Botella", "codigo_proyecto": null, "url": "https://app.notion.com/368b4f7f99f880c294dfde28bda211f8", "descripcion": "Pedir PI - 150 kg  - Búsqueda de precios para maní.", "comentarios": "USD 1.55/kg FCA", "ultimo_comentario": {"autor": "Vania Menares", "fecha": "2026-09-02", "texto": "Se solicito ya la cantidad de 150kg en WFF para WS maní , para evaluar pi despues de la info que falta"}}, {"nombre": "Homologación - Film - Edelpa", "status": "In progress", "gate": "Gate 3: Prueba Industrial", "gate_pct": 67, "fecha_creacion": "2026-06-01", "ultimo_contacto": "2026-06-01", "dias_abiertos": 115, "responsable": ["Proveedor"], "prioridad": "4 - Necesario LP", "cuadrante_kraljic": "Cuello de Botella", "codigo_proyecto": null, "url": "https://app.notion.com/372b4f7f99f880189211dfa906dfe65e", "descripcion": "Bobina estara el 05/10 - Búsqueda de opciones proveedores Film.", "comentarios": null, "ultimo_comentario": {"autor": "Vania Menares", "fecha": "2026-06-04", "texto": "Se revisa doc 04/06/26 y se consulta la vida útil y si los ensayos son valores teóricos o experimentales y si pueden mandar sus análisis (wvtr y otr)"}}, {"nombre": "Homologación - Creatina a granel - P: Merry Yang F: BOYU", "status": "In progress", "gate": "Gate 1: Prueba Laboratorio", "gate_pct": 33, "fecha_creacion": "2026-06-30", "ultimo_contacto": "2026-08-18", "dias_abiertos": 86, "responsable": ["Desarrollo"], "prioridad": "3 - Necesario MP", "cuadrante_kraljic": "Cuello de Botella", "codigo_proyecto": null, "url": "https://app.notion.com/38fb4f7f99f8806485bccf6906a91e65", "descripcion": "(En espera de granulometria de nuestras Creatina) - No cumple granulometría(200 Mesh). Muestra 300 y 500 Mesh entregada 08/09 - Búsqueda proveedores de creatina a granel.", "comentarios": null, "ultimo_comentario": {"autor": "Vania Menares", "fecha": "2026-09-21", "texto": "Se evaluo granulometría y análisis sensorial de muestras 21/09"}}, {"nombre": "Homologación - Creatina a granel - D: Sudamerica comercial F: Ningxia Taikang", "status": "In progress", "gate": "Gate 1: Prueba Laboratorio", "gate_pct": 33, "fecha_creacion": "2026-07-06", "ultimo_contacto": "2026-09-23", "dias_abiertos": 80, "responsable": ["Desarrollo"], "prioridad": "3 - Necesario MP", "cuadrante_kraljic": "Cuello de Botella", "codigo_proyecto": null, "url": "https://app.notion.com/395b4f7f99f8805ca680d357497ef053", "descripcion": "(En espera de granulometria de nuestras Creatina) - Se envia muestra a INTA, resultado Octubre - hongos y levaduras separado lo hara distribuidor - Búsqueda proveedores de creatina a granel.", "comentarios": null, "ultimo_comentario": {"autor": "Eliney", "fecha": "2026-09-04", "texto": "Hola, nueva muestra de este proyecto fue enviada con Ame Muzzo el día/ 04/09"}}, {"nombre": "Homologación - Proteína de Arveja - P: Merry Yang F: Yosin [barras]", "status": "In progress", "gate": "Gate 2: Validación Técnica", "gate_pct": 50, "fecha_creacion": "2026-07-29", "ultimo_contacto": "2026-09-20", "dias_abiertos": 57, "responsable": ["Supply"], "prioridad": "3 - Necesario MP", "cuadrante_kraljic": "Apalancamiento", "codigo_proyecto": null, "url": "https://app.notion.com/3acb4f7f99f88068b61cfed192653c52", "descripcion": "En espera de muestra - Enviados nuevos documentos 08/09 - Plan B proveedor Proteína de arveja - Mejorar costos.", "comentarios": null, "ultimo_comentario": {"autor": "Daniela Alvarado", "fecha": "2026-09-23", "texto": "por favor nos apoyas en aclarar que la homologación es para la proteína de arveja en Barras por favor en el título, me refiero."}}, {"nombre": "Homologación WPC 80 Instant - Batidos Whey - F: Lactalis P: PST", "status": "In progress", "gate": "Gate 0: Calificación Inicial", "gate_pct": 17, "fecha_creacion": "2026-08-12", "ultimo_contacto": "2026-09-23", "dias_abiertos": 43, "responsable": ["Proveedor"], "prioridad": "0 - Mega Urgente", "cuadrante_kraljic": "Estratégico", "codigo_proyecto": null, "url": "https://app.notion.com/3bab4f7f99f880a5b879dd0bbed77005", "descripcion": "Insumo validado para WF, se quiere validar para Batidos Whey. - Vania revisara ensayos/ enviada cantidad.", "comentarios": null, "ultimo_comentario": {"autor": "Vania Menares", "fecha": "2026-09-22", "texto": "Revisado y enviado los documentos faltantes son varios, además se solicita revisar la vida útil pues el estandard es mayor. 22/09"}}, {"nombre": "Homologación - WPC 80 inst (Batidos Whey)- Milk & Whey Ingredients", "status": "In progress", "gate": "Gate 1: Prueba Laboratorio", "gate_pct": 33, "fecha_creacion": "2026-09-01", "ultimo_contacto": "2026-09-04", "dias_abiertos": 23, "responsable": ["Desarrollo"], "prioridad": "0 - Mega Urgente", "cuadrante_kraljic": "Estratégico", "codigo_proyecto": null, "url": "https://app.notion.com/3ceb4f7f99f8806aa17bd72d7c6d600a", "descripcion": "Se mando muestra a INTA - revisar resultados  01/10", "comentarios": null, "ultimo_comentario": {"autor": "Daniela Alvarado", "fecha": "2026-09-23", "texto": "01.10.26 recibiremos resultados de INTA"}}, {"nombre": "Validación - Coco rallado bajo en grasa - F: VietDelta", "status": "In progress", "gate": "Gate 0: Calificación Inicial", "gate_pct": 17, "fecha_creacion": "2026-09-04", "ultimo_contacto": "2026-08-20", "dias_abiertos": 20, "responsable": ["Proveedor"], "prioridad": "2 - Necesario CP", "cuadrante_kraljic": "Apalancamiento", "codigo_proyecto": null, "url": "https://app.notion.com/3d1b4f7f99f8800a96efdf0a28676a86", "descripcion": "Solicitados nuevos documentos 22/09 - Búsqueda de opciones de proveedor de coco rallado.", "comentarios": null, "ultimo_comentario": {"autor": "Vania Menares", "fecha": "2026-09-21", "texto": "Se revisó información y se pidio faltante 21/09 . La muestra se recibe sin identificar 09/09"}}, {"nombre": "Homologación - Pasta de Dátil - F: Al Barakah  D: Al Barakah", "status": "In progress", "gate": "Gate 0: Calificación Inicial", "gate_pct": 17, "fecha_creacion": "2026-09-15", "ultimo_contacto": "2026-09-22", "dias_abiertos": 9, "responsable": ["Proveedor"], "prioridad": "0 - Mega Urgente", "cuadrante_kraljic": "Estratégico", "codigo_proyecto": null, "url": "https://app.notion.com/3dcb4f7f99f88026bac7f3f3e97bab2e", "descripcion": "Pendiente pH, °Brix y acidez desde fabricante.  Ya le compramos a Mulligan esta materia prima y se usa en Melelli.", "comentarios": null, "ultimo_comentario": {"autor": "Vania Menares", "fecha": "2026-09-23", "texto": "Se solicita información del proveedor pues es 1era compra a fabricante directo, 21/09"}}, {"nombre": "Validación - Maltitol - F: FUTASTE D: HYLEN", "status": "In progress", "gate": "Gate 0: Calificación Inicial", "gate_pct": 17, "fecha_creacion": "2026-09-23", "ultimo_contacto": "2026-09-24", "dias_abiertos": 1, "responsable": ["Desarrollo"], "prioridad": "3 - Necesario MP", "cuadrante_kraljic": "Apalancamiento", "codigo_proyecto": null, "url": "https://app.notion.com/3e4b4f7f99f880cf8610eb15ee1e8b3a", "descripcion": "Enviados documentos de proveedor. - Plan B para comprar maltitol por volumen.", "comentarios": null, "ultimo_comentario": {"autor": "Eliney", "fecha": "2026-09-23", "texto": "Muestra dejada en escritorio 23/09"}}, {"nombre": "Homologación - Crispín de cacao - P: Merry Yang F: COWIN", "status": "In progress", "gate": "Gate 0: Calificación Inicial", "gate_pct": 17, "fecha_creacion": "2026-09-23", "ultimo_contacto": "2026-09-22", "dias_abiertos": 1, "responsable": ["Desarrollo"], "prioridad": "2 - Necesario CP", "cuadrante_kraljic": "Apalancamiento", "codigo_proyecto": null, "url": "https://app.notion.com/3e4b4f7f99f880f398c7eaf18bdee27b", "descripcion": "Entregada muestra y enviados certificados y FT. - Mejorar precios de Crispín de cacao, desarrollo en China.", "comentarios": null, "ultimo_comentario": {"autor": "Eliney", "fecha": "2026-09-23", "texto": "Muestra dejada en escritorio 23/09"}}], "finished": [{"nombre": "Validación - WPC 80 inst (Batidos Whey) - F: Sooro", "status": "Rechazado", "validado": false, "gate_final": "Gate 1: Prueba Laboratorio", "fecha_creacion": "2026-09-08", "ultimo_contacto": "2026-09-04", "dias_totales": null, "responsable": ["Desarrollo"], "prioridad": null, "codigo_proyecto": null}, {"nombre": "Homologación - Coco rallado - P: alto la cruz F: PT SARI SEGAR HUSADA", "status": "Aprobado", "validado": true, "gate_final": "Gate 3: Prueba Industrial", "fecha_creacion": "2026-07-23", "ultimo_contacto": null, "dias_totales": null, "responsable": ["Desarrollo"], "prioridad": "0 - Mega Urgente", "codigo_proyecto": null}, {"nombre": "Homologación Coco laminado - P: Induproma  F: Dong Duong Dragon.", "status": "Desechado", "validado": false, "gate_final": "Gate 0: Calificación Inicial", "fecha_creacion": "2026-06-04", "ultimo_contacto": "2026-06-03", "dias_totales": null, "responsable": ["Proveedor"], "prioridad": "2 - Necesario CP", "codigo_proyecto": null}, {"nombre": "Homologación - Estuches Display WP x5 + x16 - Fullprint.", "status": "Desechado", "validado": false, "gate_final": "Gate 0: Calificación Inicial", "fecha_creacion": "2026-05-22", "ultimo_contacto": "2026-05-22", "dias_totales": 0, "responsable": ["Supply"], "prioridad": "4 - Necesario LP", "codigo_proyecto": null}, {"nombre": "Homologación Film - Eroflex", "status": "Aprobado", "validado": true, "gate_final": "Gate 3: Prueba Industrial", "fecha_creacion": "2026-05-12", "ultimo_contacto": "2026-05-12", "dias_totales": 0, "responsable": ["Proveedor"], "prioridad": "1 - Necesario Hoy", "codigo_proyecto": null}, {"nombre": "Homologación - Doypack Shake - San Jorge Packaging", "status": "Aprobado", "validado": true, "gate_final": "Gate 4: Compra", "fecha_creacion": "2026-03-17", "ultimo_contacto": "2026-05-05", "dias_totales": 49, "responsable": ["Proveedor"], "prioridad": "0 - Mega Urgente", "codigo_proyecto": null}, {"nombre": "Homologación - Film - San Jorge Packaging", "status": "Aprobado", "validado": true, "gate_final": "Gate 3: Prueba Industrial", "fecha_creacion": "2026-03-17", "ultimo_contacto": "2026-05-05", "dias_totales": 49, "responsable": ["Desarrollo"], "prioridad": "0 - Mega Urgente", "codigo_proyecto": null}, {"nombre": "Homologación - Maní Tostado en mitades - P: Saporiti F: Grupo alval", "status": "Aprobado", "validado": true, "gate_final": "Gate 5: Excepción Gerencial", "fecha_creacion": "2026-03-25", "ultimo_contacto": "2026-05-04", "dias_totales": 40, "responsable": ["Desarrollo"], "prioridad": "0 - Mega Urgente", "codigo_proyecto": null}, {"nombre": "Homologación Coco Rallado - Rong Ta", "status": "Desechado", "validado": false, "gate_final": null, "fecha_creacion": "2025-12-11", "ultimo_contacto": null, "dias_totales": null, "responsable": [], "prioridad": "3 - Necesario MP", "codigo_proyecto": "SPHM2025233"}, {"nombre": "Homologación - Film - Serplas", "status": "Pausado", "validado": false, "gate_final": null, "fecha_creacion": "2026-01-07", "ultimo_contacto": null, "dias_totales": null, "responsable": [], "prioridad": "0 - Mega Urgente", "codigo_proyecto": "SPHM2025249"}, {"nombre": "Homologación - WPC Instantáneo - VILVI - Comercial Cerrillos.", "status": "Pausado", "validado": false, "gate_final": null, "fecha_creacion": "2026-01-07", "ultimo_contacto": null, "dias_totales": null, "responsable": [], "prioridad": "0 - Mega Urgente", "codigo_proyecto": "SPHM2025248"}, {"nombre": "Homologación Doypack Creatina - San Jorge Packaging", "status": "Aprobado", "validado": true, "gate_final": "Gate 3: Prueba Industrial", "fecha_creacion": "2026-04-23", "ultimo_contacto": "2026-04-30", "dias_totales": 7, "responsable": ["Desarrollo"], "prioridad": "0 - Mega Urgente", "codigo_proyecto": null}, {"nombre": "Homologación Film - Plastiservi", "status": "Pausado", "validado": false, "gate_final": null, "fecha_creacion": "2025-11-25", "ultimo_contacto": null, "dias_totales": null, "responsable": [], "prioridad": "0 - Mega Urgente", "codigo_proyecto": "SPHM2025221"}, {"nombre": "Homologación coco rallado Wild Fit - Pacífico Sur", "status": "Desechado", "validado": false, "gate_final": "Gate 0: Calificación Inicial", "fecha_creacion": "2025-11-27", "ultimo_contacto": null, "dias_totales": null, "responsable": ["Supply"], "prioridad": "2 - Necesario CP", "codigo_proyecto": "SPHM2025224"}, {"nombre": "Homologación Film - Marple", "status": "Rechazado", "validado": false, "gate_final": "Gate 3: Prueba Industrial", "fecha_creacion": "2025-09-26", "ultimo_contacto": "2026-04-24", "dias_totales": 210, "responsable": ["Proveedor"], "prioridad": "2 - Necesario CP", "codigo_proyecto": "SPHM2025189"}, {"nombre": "Homologación WPC 80 Reg - P: Pacific Sur F: Agropur", "status": "Aprobado", "validado": true, "gate_final": "Gate 5: Excepción Gerencial", "fecha_creacion": "2026-04-09", "ultimo_contacto": null, "dias_totales": null, "responsable": [], "prioridad": "0 - Mega Urgente", "codigo_proyecto": null}, {"nombre": "Homologación (Reformulación) pasar del 309 al 570 (crispin)  IFF", "status": "Desechado", "validado": false, "gate_final": null, "fecha_creacion": "2025-10-27", "ultimo_contacto": null, "dias_totales": null, "responsable": [], "prioridad": "1 - Necesario Hoy", "codigo_proyecto": "SPHM2025213"}, {"nombre": "Homologación - Almendra Natural entera (non pareil)-  P: Indufrut F: Transargen", "status": "Pausado", "validado": false, "gate_final": "Gate 0: Calificación Inicial", "fecha_creacion": "2026-01-29", "ultimo_contacto": "2026-04-26", "dias_totales": 87, "responsable": ["Proveedor"], "prioridad": "3 - Necesario MP", "codigo_proyecto": null}, {"nombre": "Homologación - Creatina a granel - P: Merry Yang F: Inner Mongolia", "status": "Rechazado", "validado": false, "gate_final": "Gate 0: Calificación Inicial", "fecha_creacion": "2026-01-27", "ultimo_contacto": "2026-03-26", "dias_totales": 58, "responsable": ["Proveedor"], "prioridad": "2 - Necesario CP", "codigo_proyecto": "SPHM2026006"}, {"nombre": "Homologación - WPC 90 inst- Milk & Whey Ingredients", "status": "Desechado", "validado": false, "gate_final": "Gate 0: Calificación Inicial", "fecha_creacion": "2026-03-25", "ultimo_contacto": null, "dias_totales": null, "responsable": [], "prioridad": "4 - Necesario LP", "codigo_proyecto": null}], "gate_order": ["Gate 0: Calificación Inicial", "Gate 1: Prueba Laboratorio", "Gate 2: Validación Técnica", "Gate 3: Prueba Industrial", "Gate 4: Compra", "Gate 5: Excepción Gerencial"], "quarterly": [{"label": "Q1 2025", "count": 3, "current": false}, {"label": "Q2 2025", "count": 2, "current": false}, {"label": "Q3 2025", "count": 5, "current": false}, {"label": "Q4 2025", "count": 15, "current": false}, {"label": "Q1 2026", "count": 13, "current": false}, {"label": "Q2 2026", "count": 6, "current": false}, {"label": "Q3 2026", "count": 1, "current": true}]};
+
+const GATES = DATA.gate_order;
+const GATE_SHORT = {
+  "Gate 0: Calificación Inicial":"Calificación inicial",
+  "Gate 1: Prueba Laboratorio":"Prueba laboratorio",
+  "Gate 2: Validación Técnica":"Validación técnica",
+  "Gate 3: Prueba Industrial":"Prueba industrial",
+  "Gate 4: Compra":"Compra",
+  "Gate 5: Excepción Gerencial":"Excepción gerencial"
+};
+const GATE_COLOR = ["var(--g0)","var(--g1)","var(--g2)","var(--g3)","var(--g4)","var(--g5)"];
+
+function fmtDate(s){
+  if(!s) return "—";
+  const d = new Date(s+"T00:00:00");
+  return d.toLocaleDateString("es-CL",{day:"2-digit",month:"short",year:"numeric"});
+}
+function prioClass(p){
+  if(!p) return "prio-3";
+  const n = p.trim()[0];
+  return "prio-"+n;
+}
+function daysClass(n){
+  if(n==null) return "";
+  if(n<60) return "good";
+  if(n<150) return "warn";
+  return "crit";
+}
+function toMonths(days){
+  if(days==null) return null;
+  return Math.round(days/30*10)/10;
+}
+function fmtMonths(days){
+  const m = toMonths(days);
+  return m==null ? null : (Number.isInteger(m) ? m.toFixed(1) : m.toString());
+}
+
+// ---------- KPI strip ----------
+function renderKPIs(){
+  const active = DATA.active;
+  const finished = DATA.finished;
+  const avgDays = Math.round(active.reduce((a,x)=>a+(x.dias_abiertos||0),0)/active.length);
+  const validated = finished.filter(x=>x.validado).length;
+  const rejected = finished.filter(x=>x.status==="Desechado"||x.status==="Rechazado").length;
+  const overdue = active.filter(x=>x.dias_abiertos>150).length;
+
+  const items = [
+    {label:"Insumos en proceso", value: active.length, sub:"vista Homologación", cls:""},
+    {label:"Meses abiertos (promedio)", value: fmtMonths(avgDays), sub:"meses desde creación", cls: daysClass(avgDays)},
+    {label:"Sobre 5 meses abiertos", value: overdue, sub:"de "+active.length+" insumos activos", cls: overdue>0?"crit":"good"},
+    {label:"Validados (historial reciente)", value: validated+" de "+finished.length, sub: rejected+" rechazados/desechados", cls:"good"},
+  ];
+  document.getElementById("kpi-strip").innerHTML = items.map(k=>`
+    <div class="kpi">
+      <div class="label">${k.label}</div>
+      <div class="value tabular ${k.cls}">${k.value}</div>
+      <div class="sub">${k.sub}</div>
+    </div>`).join("");
+}
+
+// ---------- distribución por etapa ----------
+function renderFunnel(){
+  const active = DATA.active;
+  const counts = GATES.map(g=> active.filter(x=>x.gate===g).length);
+  const total = active.length;
+  const maxC = Math.max(...counts, 1);
+  const rows = document.getElementById("funnel-bar");
+  rows.innerHTML = GATES.map((g,i)=>{
+    const c = counts[i];
+    const w = c ? Math.max(c/maxC*100, 6) : 0;
+    return `
+    <div class="stage-row">
+      <span class="stage-name"><span class="stage-swatch" style="background:${GATE_COLOR[i]}"></span>${GATE_SHORT[g]}</span>
+      <span class="stage-track"><span class="stage-fill" style="width:${w}%; background:${GATE_COLOR[i]}"></span></span>
+      <span class="stage-count tabular">${c}</span>
+    </div>`;
+  }).join("");
+  document.getElementById("funnel-count").textContent = total+" insumos activos";
+}
+
+// ---------- filters state ----------
+let filters = {q:"", gate:"", resp:new Set(), prio:"", sort:"old"};
+
+function updateRespButton(){
+  const btn = document.getElementById("f-resp-btn");
+  const badge = document.getElementById("f-resp-count");
+  const n = filters.resp.size;
+  btn.classList.toggle("active", n>0);
+  badge.hidden = n===0;
+  if(n>0) badge.textContent = n;
+}
+
+function renderRespPanel(){
+  const resps = [...new Set(DATA.active.flatMap(x=>x.responsable))].sort();
+  const panel = document.getElementById("f-resp-panel");
+  panel.innerHTML = resps.map(r=>`
+    <label class="msel-opt">
+      <input type="checkbox" value="${r}" ${filters.resp.has(r)?"checked":""}>
+      ${r}
+    </label>`).join("");
+  panel.querySelectorAll("input[type=checkbox]").forEach(cb=>{
+    cb.addEventListener("change", ()=>{
+      if(cb.checked) filters.resp.add(cb.value); else filters.resp.delete(cb.value);
+      updateRespButton();
+      renderBoard();
+    });
+  });
+}
+
+function populateFilterOptions(){
+  const gateSel = document.getElementById("f-gate");
+  GATES.forEach(g=>{
+    if(DATA.active.some(x=>x.gate===g)){
+      const o = document.createElement("option"); o.value=g; o.textContent=GATE_SHORT[g];
+      gateSel.appendChild(o);
+    }
+  });
+  renderRespPanel();
+
+  const prios = [...new Set(DATA.active.map(x=>x.prioridad).filter(Boolean))].sort();
+  const prioSel = document.getElementById("f-prio");
+  prios.forEach(p=>{ const o=document.createElement("option"); o.value=p; o.textContent=p; prioSel.appendChild(o); });
+}
+
+function cardHTML(item){
+  const gi = GATES.indexOf(item.gate);
+  const steps = GATES.map((g,i)=>{
+    let cls = "step";
+    if(i<gi) cls += " done";
+    if(i===gi) cls += " current";
+    const bg = i<=gi ? GATE_COLOR[gi] : "";
+    return `<div class="${cls}" style="${i<=gi?`background:${GATE_COLOR[gi]}`:""}"></div>`;
+  }).join("");
+  const dc = daysClass(item.dias_abiertos);
+  const respChips = item.responsable.map(r=>`<span class="chip resp">${r}</span>`).join("");
+  const prioChip = item.prioridad ? `<span class="chip ${prioClass(item.prioridad)}">${item.prioridad}</span>` : "";
+  const kraljicChip = item.cuadrante_kraljic ? `<span class="chip kraljic">${item.cuadrante_kraljic}</span>` : "";
+  return `
+  <div class="card">
+    <div class="card-top">
+      <div class="card-title">${item.nombre}</div>
+      ${item.codigo_proyecto ? `<div class="card-code mono">${item.codigo_proyecto}</div>` : ""}
+    </div>
+    <div class="chips">${respChips}${prioChip}${kraljicChip}</div>
+    <div>
+      <div class="stepper">${steps}</div>
+      <div class="gate-label"><span>Etapa actual</span><b>${GATE_SHORT[item.gate] || "—"}</b></div>
+    </div>
+    <div class="card-bottom">
+      <div class="days">
+        <span class="n tabular ${dc}">${fmtMonths(item.dias_abiertos) ?? "—"}</span>
+        <span class="cap">meses abiertos</span>
+      </div>
+    </div>
+    <div class="card-hint ${dc==='crit'?'crit':''}">${dc==='crit' ? "⚠ Ver motivo del atraso →" : "Ver detalle →"}</div>
+  </div>`;
+}
+
+function renderBoard(){
+  let items = DATA.active.filter(x=>{
+    if(filters.q){
+      const q = filters.q.toLowerCase();
+      const hay = (x.nombre+" "+(x.codigo_proyecto||"")).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    if(filters.gate && x.gate!==filters.gate) return false;
+    if(filters.resp.size && !x.responsable.some(r=>filters.resp.has(r))) return false;
+    if(filters.prio && x.prioridad!==filters.prio) return false;
+    return true;
+  });
+  items = items.sort((a,b)=> filters.sort==="new"
+    ? (a.dias_abiertos||0)-(b.dias_abiertos||0)
+    : (b.dias_abiertos||0)-(a.dias_abiertos||0));
+  document.getElementById("board-count").textContent = items.length+" de "+DATA.active.length;
+  const board = document.getElementById("board");
+  board.innerHTML = items.length ? items.map(cardHTML).join("") : `<div class="empty-note" style="grid-column:1/-1">No hay insumos que calcen con estos filtros.</div>`;
+  if(items.length){
+    board.querySelectorAll(".card").forEach((el,i)=>{
+      el.addEventListener("click", ()=>openDetail(items[i]));
+    });
+  }
+}
+
+// ---------- detail modal ----------
+function escapeHtml(s){
+  return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function mdLite(s){
+  return escapeHtml(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+}
+function fmtCommentDate(s){
+  if(!s) return "";
+  const d = new Date(s+"T00:00:00");
+  if(isNaN(d)) return s;
+  return d.toLocaleDateString("es-CL", {day:"numeric", month:"short", year:"numeric"});
+}
+function openDetail(item){
+  const dc = daysClass(item.dias_abiertos);
+  const respChips = item.responsable.map(r=>`<span class="chip resp">${r}</span>`).join("");
+  const prioChip = item.prioridad ? `<span class="chip ${prioClass(item.prioridad)}">${item.prioridad}</span>` : "";
+  const kraljicChip = item.cuadrante_kraljic ? `<span class="chip kraljic">${item.cuadrante_kraljic}</span>` : "";
+  const body = document.getElementById("modal-body");
+  body.innerHTML = `
+    <div class="modal-title" id="modal-title">${escapeHtml(item.nombre)}</div>
+    ${item.codigo_proyecto ? `<div class="modal-code mono">${escapeHtml(item.codigo_proyecto)}</div>` : ""}
+    <div class="chips">${respChips}${prioChip}${kraljicChip}</div>
+    <div class="modal-stat-row">
+      <div class="modal-stat"><span class="k">Etapa actual</span><span class="v">${GATE_SHORT[item.gate] || "—"}</span></div>
+      <div class="modal-stat"><span class="k">Meses abiertos</span><span class="v tabular ${dc}">${fmtMonths(item.dias_abiertos) ?? "—"}</span></div>
+      <div class="modal-stat"><span class="k">Creado</span><span class="v">${fmtDate(item.fecha_creacion)}</span></div>
+      <div class="modal-stat"><span class="k">Último contacto</span><span class="v">${fmtDate(item.ultimo_contacto)}</span></div>
+    </div>
+    <div class="modal-section">
+      <h4>Descripción / avance (Notion)</h4>
+      ${item.descripcion ? `<p>${mdLite(item.descripcion)}</p>` : `<p class="modal-empty">Sin descripción registrada en Notion.</p>`}
+    </div>
+    <div class="modal-section">
+      <h4>Campo "Comentarios" (Notion)</h4>
+      ${item.comentarios ? `<p>${mdLite(item.comentarios)}</p>` : `<p class="modal-empty">Sin comentarios registrados.</p>`}
+    </div>
+    <div class="modal-section modal-section-highlight">
+      <h4>💬 Último comentario en Notion (discusión de la página)</h4>
+      ${item.ultimo_comentario ? `
+        <div class="modal-comment-meta"><strong>${escapeHtml(item.ultimo_comentario.autor)}</strong> · ${fmtCommentDate(item.ultimo_comentario.fecha)}</div>
+        <p>${mdLite(item.ultimo_comentario.texto)}</p>
+      ` : `<p class="modal-empty">Sin comentarios registrados en Notion.</p>`}
+    </div>
+    ${item.url ? `<a class="modal-link" href="${item.url}" target="_blank" rel="noopener">Abrir ficha completa en Notion ↗</a>` : ""}
+  `;
+  document.getElementById("detail-modal").hidden = false;
+  document.body.style.overflow = "hidden";
+}
+function closeDetail(){
+  document.getElementById("detail-modal").hidden = true;
+  document.body.style.overflow = "";
+}
+
+// ---------- validaciones por trimestre ----------
+function renderQuarters(){
+  const q = DATA.quarterly || [];
+  const maxC = Math.max(...q.map(x=>x.count), 1);
+  const total = q.reduce((a,x)=>a+x.count,0);
+  const rows = document.getElementById("quarter-bar");
+  rows.innerHTML = q.map(x=>{
+    const w = x.count ? Math.max(x.count/maxC*100, 6) : 0;
+    return `
+    <div class="qtr-row">
+      <span class="qtr-name">${x.label}${x.current ? `<span class="qtr-tag">en curso</span>` : ""}</span>
+      <span class="qtr-track"><span class="qtr-fill ${x.current?"current":""}" style="width:${w}%"></span></span>
+      <span class="qtr-count tabular">${x.count}</span>
+    </div>`;
+  }).join("");
+  document.getElementById("quarter-count").textContent = total+" validados desde "+(q[0] ? q[0].label : "");
+}
+
+function resultChip(item){
+  if(item.status==="Done"||item.status==="Aprobado") return `<span class="result-chip ok">✓ Validado</span>`;
+  if(item.status==="Desechado"||item.status==="Rechazado") return `<span class="result-chip no">✕ ${item.status}</span>`;
+  return `<span class="result-chip pause">${item.status}</span>`;
+}
+
+function renderHistory(){
+  const rows = DATA.finished.map(item=>`
+    <tr>
+      <td class="name">${item.nombre}${item.codigo_proyecto? `<span class="code mono">${item.codigo_proyecto}</span>`:""}</td>
+      <td>${resultChip(item)}</td>
+      <td>${item.gate_final ? GATE_SHORT[item.gate_final] : "—"}</td>
+      <td class="tabular">${fmtMonths(item.dias_totales)!=null ? fmtMonths(item.dias_totales)+"m" : "n/d"}</td>
+      <td>${item.responsable.length? item.responsable.join(", ") : "—"}</td>
+      <td>${item.prioridad || "—"}</td>
+    </tr>`).join("");
+  document.getElementById("hist-body").innerHTML = rows;
+  document.getElementById("hist-count").textContent = DATA.finished.length+" insumos";
+}
+
+function init(){
+  document.getElementById("today-label").textContent = fmtDate(DATA.today);
+  document.getElementById("active-count-label").textContent = DATA.active.length;
+  renderKPIs();
+  renderFunnel();
+  populateFilterOptions();
+  renderBoard();
+  renderQuarters();
+  renderHistory();
+
+  document.getElementById("f-search").addEventListener("input", e=>{filters.q=e.target.value; renderBoard();});
+  document.getElementById("f-gate").addEventListener("change", e=>{filters.gate=e.target.value; renderBoard();});
+  document.getElementById("f-prio").addEventListener("change", e=>{filters.prio=e.target.value; renderBoard();});
+  document.getElementById("f-sort").addEventListener("change", e=>{filters.sort=e.target.value; renderBoard();});
+
+  const respWrap = document.getElementById("f-resp-wrap");
+  const respBtn = document.getElementById("f-resp-btn");
+  const respPanel = document.getElementById("f-resp-panel");
+  respBtn.addEventListener("click", e=>{
+    e.stopPropagation();
+    respPanel.hidden = !respPanel.hidden;
+  });
+  document.addEventListener("click", e=>{
+    if(!respWrap.contains(e.target)) respPanel.hidden = true;
+  });
+
+  document.getElementById("f-reset").addEventListener("click", ()=>{
+    filters={q:"",gate:"",resp:new Set(),prio:"",sort:"old"};
+    document.getElementById("f-search").value="";
+    document.getElementById("f-gate").value="";
+    document.getElementById("f-prio").value="";
+    document.getElementById("f-sort").value="old";
+    updateRespButton();
+    renderRespPanel();
+    respPanel.hidden = true;
+    renderBoard();
+  });
+
+  const detailModal = document.getElementById("detail-modal");
+  document.getElementById("modal-close").addEventListener("click", closeDetail);
+  detailModal.addEventListener("click", e=>{
+    if(e.target === detailModal) closeDetail();
+  });
+  document.addEventListener("keydown", e=>{
+    if(e.key === "Escape" && !detailModal.hidden) closeDetail();
+  });
+}
+init();
+</script>
